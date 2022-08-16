@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List
-from .. import models, schemas
+from .. import models, schemas, oauth2
 from ..database import get_db
 
 router = APIRouter(
@@ -15,7 +15,7 @@ def get_videogames(db: Session = Depends(get_db)):
     return games
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.VideoGame)
-def create_videogame(game: schemas.VideoGame, db: Session = Depends(get_db)):
+def create_videogame(game: schemas.VideoGame, db: Session = Depends(get_db), get_current_user: int = Depends(oauth2.get_current_user)):
     new_game = models.VideoGame(**game.dict())
     db.add(new_game)
     db.commit()
